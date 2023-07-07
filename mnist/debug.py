@@ -47,7 +47,7 @@ def forward_prop(W1, b1, W2, b2, X):
     return Z1, A1, Z2, A2
 
 def one_hot(Y):
-    one_hot_Y = np.zeros((Y.size, Y.max() + 1))
+    one_hot_Y = np.zeros((Y.size, 10))
     one_hot_Y[np.arange(Y.size), Y] = 1
     one_hot_Y = one_hot_Y.T
     return one_hot_Y
@@ -57,7 +57,11 @@ def deriv_ReLU(Z):
 
 def back_prop(Z1, A1, Z2, A2, W1, W2, X, Y):
     one_hot_Y = one_hot(Y)
+    print("Y", Y.shape, Y)
+    print("A2", A2.shape, A2[2])
+    print(f"A2: {A2[2]}")
     dZ2 = A2 - one_hot_Y
+    print("dZ2: ", dZ2[2].tolist())
     dW2 = 1 / m * dZ2.dot(A1.T)
     db2 = 1 / m * np.sum(dZ2)
     dZ1 = W2.T.dot(dZ2) * deriv_ReLU(Z1)
@@ -83,13 +87,13 @@ def get_accuracy(predictions, Y):
 def gradient_descent(X, Y, iterations, alpha):
     W1, b1, W2, b2 = load_weights()
 
-    for i in range(iterations):
-        Z1, A1, Z2, A2 = forward_prop(W1, b1, W2, b2, X)
-        dW1, db1, dW2, db2 = back_prop(Z1, A1, Z2, A2, W1, W2, X, Y)
-        W1, b1, W2, b2 = update_params(W1, b1, W2, b2, dW1, db1, dW2, db2, alpha)
-        if i % 10 == 0:
-            print("Iteration: ", i)
-            print("Accuracy: ", get_accuracy(get_predictions(A2), Y))
+    # for i in range(iterations):
+    Z1, A1, Z2, A2 = forward_prop(W1, b1, W2, b2, X)
+    dW1, db1, dW2, db2 = back_prop(Z1, A1, Z2, A2, W1, W2, X, Y)
+    W1, b1, W2, b2 = update_params(W1, b1, W2, b2, dW1, db1, dW2, db2, alpha)
+    # if i % 10 == 0:
+    #     print("Iteration: ", i)
+    #     print("Accuracy: ", get_accuracy(get_predictions(A2), Y))
     return W1, b1, W2, b2
 
 def make_predictions(X, W1, b1, W2, b2):
@@ -127,7 +131,7 @@ def load_weights():
 
 W1, b1, W2, b2 = gradient_descent(X_train, Y_train, 500, 0.05)
 
-save_weights(W1, b1, W2, b2)
+#save_weights(W1, b1, W2, b2)
 
-test_predictions = make_predictions(X_test, W1, b1, W2, b2)
-print("Accuracy: ", get_accuracy(test_predictions, Y_test))
+#test_predictions = make_predictions(X_test, W1, b1, W2, b2)
+#print("Accuracy: ", get_accuracy(test_predictions, Y_test))
