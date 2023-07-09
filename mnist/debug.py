@@ -35,6 +35,9 @@ def init_params():
 def ReLU(Z):
     return np.maximum(Z, 0)
 
+def deriv_ReLU(Z):
+    return Z > 0
+
 def softmax(Z):
     A = np.exp(Z) / sum(np.exp(Z))
     return A
@@ -46,23 +49,29 @@ def forward_prop(W1, b1, W2, b2, X):
     A2 = softmax(Z2)
     return Z1, A1, Z2, A2
 
+# input: [1 2 3]
+# return:
+# [
+#   [1 0 0],
+#   [0 1 0],
+#   [0 0 1] 
+# ]
 def one_hot(Y):
     one_hot_Y = np.zeros((Y.size, 10))
     one_hot_Y[np.arange(Y.size), Y] = 1
     one_hot_Y = one_hot_Y.T
     return one_hot_Y
 
-def deriv_ReLU(Z):
-    return Z > 0
-
 def back_prop(Z1, A1, Z2, A2, W1, W2, X, Y):
     one_hot_Y = one_hot(Y)
-    print("Y", Y.shape, Y)
-    print("A2", A2.shape, A2[2])
-    print(f"A2: {A2[2]}")
     dZ2 = A2 - one_hot_Y
-    print("dZ2: ", dZ2[2].tolist())
+    print("m: ", m)
+    print("dZ2.dot(A1.T): ", m * dZ2.dot(A1.T))
     dW2 = 1 / m * dZ2.dot(A1.T)
+    print('dZ2.shape', dZ2.shape)
+    print('A1.shape', A1.shape)
+    print('dW2.shape', dW2.shape)
+    print('dW2', dW2)
     db2 = 1 / m * np.sum(dZ2)
     dZ1 = W2.T.dot(dZ2) * deriv_ReLU(Z1)
     dW1 = 1 / m * dZ1.dot(X.T)
@@ -71,6 +80,7 @@ def back_prop(Z1, A1, Z2, A2, W1, W2, X, Y):
     return dW1, db1, dW2, db2
 
 def update_params(W1, b1, W2, b2, dW1, db1, dW2, db2, alpha):
+    print("W2.shape", W2.shape)
     W1 = W1 - alpha * dW1
     b1 = b1 - alpha * db1
     W2 = W2 - alpha * dW2
